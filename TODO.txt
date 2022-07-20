@@ -1,0 +1,2 @@
+Order colorValues in XFrameDeck.
+Write new Readme.
