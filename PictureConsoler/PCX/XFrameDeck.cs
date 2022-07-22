@@ -8,6 +8,8 @@ namespace PictureConsoler.PCX
     {
         public const byte sign = 1;
 
+        public XFrame PrevProcessedFrame { get; private set; }
+
         public XFrameDeck(byte symbolW, byte symbolH, ushort frameW, ushort frameH, ushort frameCount) :
             base(symbolW, symbolH, frameW, frameH, frameCount) { }
         public XFrameDeck(BinaryReader stream) : base(stream) { }
@@ -28,11 +30,15 @@ namespace PictureConsoler.PCX
 
         protected override void InitFramesFromPreconsoled(Bitmap[] precFrames)
         {
+            PrevProcessedFrame = null;
             for (ushort i = 0; i < precFrames.Length; i++)
             {
-                Frames[i] = new XFrame(this);
-                Frames[i].FillColors(precFrames[i]);
+                XFrame frame = new XFrame(this);
+                Frames[i] = frame;
+                frame.FillColors(precFrames[i]);
+                PrevProcessedFrame = frame;
             }
+            PrevProcessedFrame = null;
         }
 
         public static FrameDeck LoadAsPCXF(string path)

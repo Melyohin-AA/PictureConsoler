@@ -46,6 +46,12 @@ namespace PictureConsoler.PCX
         {
             var mcd = new MassColorsDeterminor(System.Linq.Enumerable.Cast<Color>(sectors));
             colorValues = mcd.Determine();
+            XFrame prev = ((XFrameDeck)Deck).PrevProcessedFrame;
+            if (prev != null)
+            {
+                var cvo = new ColorValuesOrderer(prev.colorValues, colorValues);
+                colorValues = cvo.Order();
+            }
         }
         private void FillColorsX(Color[,] sectors)
         {

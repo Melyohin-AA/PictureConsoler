@@ -66,6 +66,7 @@
     <Compile Include="PCM\MFrame.cs" />
     <Compile Include="PCM\MFrameDeck.cs" />
     <Compile Include="OutlineHighlighter.cs" />
+    <Compile Include="PCX\ColorValuesOrderer.cs" />
     <Compile Include="PCX\XFrame.cs" />
     <Compile Include="PCX\MassColorsDeterminor.cs" />
     <Compile Include="PCX\XFrameDeck.cs" />

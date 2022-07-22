@@ -74,6 +74,7 @@ namespace PictureConsoler
             }
             byte pw, ph, fontIndex = 255;
             FileInfo info = new FileInfo(path);
+            Console.Title = $"{info.Name} - {Console.Title}";
             string fileExt = info.Extension.ToLower();
             if (IsExtSpecial(fileExt))
             {
@@ -141,13 +142,11 @@ namespace PictureConsoler
             foreach (ConsoleFont font in fonts)
                 Console.WriteLine("#{0} - {1}x{2}", font.Index, font.SizeX, font.SizeY);
             Console.Write("Select font (index): ");
-            //byte pixelPixel = 0;
             while (true)
             {
                 string strFont = Console.ReadLine();
                 if (TryParseAsFontByForce(strFont, out width, out height, out index)) return;
                 if (byte.TryParse(strFont, out index) && (index < fonts.Length)) break;
-                //if (byte.TryParse(strFont, out index) && (index < fonts.Length)) break;
                 Console.Write("Parsing failed. Correct: ");
             }
             width = (byte)fonts[index].SizeX;
@@ -324,7 +323,6 @@ namespace PictureConsoler
             if (shiftBuffer)
             {
                 ShiftBuffer.Prepare();
-                //FreeFramesMemory_ShiftBufferMode();
                 if (interval == 0) ShiftBuffer.LoopDisplayImmediately();
                 else ShiftBuffer.LoopDisplay();
             }
