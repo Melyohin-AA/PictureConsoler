@@ -29,7 +29,7 @@
 
 Разработка велась на языке программирования `C#` с использованием `.NET Framework 4.7.2`. Среда разработки - `Microsoft Visual Studio 2017`. Тип приложения - `Console Application`.
 
-![product-screenshot](product-screenshot.png)
+![product-screenshot](https://github.com/Melyohin-AA/PictureConsoler/raw/master/_ReadmeFiles/product-screenshot.png)
 
 
 ### Использование
