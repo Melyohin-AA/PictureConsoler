@@ -7,10 +7,11 @@
   <p align="center">Вывод изображений в консоль Windows</p>
 </div>
 
+<div align="center">
+  <img src="https://github.com/Melyohin-AA/PictureConsoler/raw/master/_ReadmeFiles/main.png" alt="main">
+</div>
 
 ### О проекте
-
-![product-screenshot](https://github.com/Melyohin-AA/PictureConsoler/raw/master/_ReadmeFiles/HSV_cone.png~PCX.png)
 
 Данный проект представляет собой приложение, позволяющее выводить изображения в консоль Windows в различных вариациях.
 
@@ -27,6 +28,8 @@
 * Целевая ОС - Windows 10
 
 Разработка велась на языке программирования `C#` с использованием `.NET Framework 4.7.2`. Среда разработки - `Microsoft Visual Studio 2017`. Тип приложения - `Console Application`.
+
+![product-screenshot](product-screenshot.png)
 
 
 ### Использование
