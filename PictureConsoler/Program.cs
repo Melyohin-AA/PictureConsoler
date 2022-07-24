@@ -14,6 +14,7 @@ namespace PictureConsoler
         public const string Ext = ".pcuf", OldClassicExt = ".pcff", OldXExt = ".pcxf";
         public const string Caption = "Picture Consoler";
         public const short Buff = 0x7FFF;
+        private const short keyReadInterval = 50;
 
         public static FrameDeck Deck { get; private set; }
         private static bool auto = false, shiftBuffer = false;
@@ -114,7 +115,7 @@ namespace PictureConsoler
             }
             if (Deck.Frames.Length > 1)
             {
-                Console.Write("Inerval (0-65535) : ");
+                Console.Write("Inerval (0-65535 in ms) : ");
                 interval = ReadDB_Interval();
                 ShiftBuffer.CalcColumnRow();
                 if (ShiftBuffer.ModeOpportunity)
@@ -199,6 +200,8 @@ namespace PictureConsoler
                 PCX.MassColorsDeterminor.Use6Threads = ReadDiscretAnswer();
                 Console.Write("Use reduced 21-bit colors for calculations? {Y/N} ");
                 PCX.MassColorsDeterminor.UseReducedColors = ReadDiscretAnswer();
+                Console.Write("Ignore one color sectors count? {Y/N} ");
+                PCX.MassColorsDeterminor.IgnoreColorCount = ReadDiscretAnswer();
             }
         }
 
@@ -323,88 +326,80 @@ namespace PictureConsoler
             if (shiftBuffer)
             {
                 ShiftBuffer.Prepare();
-                if (interval == 0) ShiftBuffer.LoopDisplayImmediately();
-                else ShiftBuffer.LoopDisplay();
+                ShiftBuffer.LoopDisplay();
             }
-            else if ((interval == 0) || (Deck.Frames.Length == 1)) LoopDisplayImmediately();
+            else if (Deck.Frames.Length == 1) DisplaySingle();
             else LoopDisplay();
         }
 
         private static void LoopDisplay()
         {
             Stopwatch stopwatch = new Stopwatch();
-            bool update = false;
             while (true)
             {
-                int delta = 0;
                 if (auto) stopwatch.Restart();
-                if (update) update = false;
-                else Deck.Cons.Draw(graph);
-                Deck.NextFrame();
-                graph.Redraw();
-                if (auto)
-                {
-                    delta = (int)(interval - stopwatch.ElapsedMilliseconds);
-                    Console.Title = Caption + ' ' + delta;
-                    if (delta > 0)
-                    {
-                        update = true;
-                        Deck.Cons.Draw(graph);
-                        Deck.ApplyColorValues();
-                        while (stopwatch.ElapsedMilliseconds < interval) Thread.Sleep(1);
-                    }
-                    stopwatch.Stop();
-                }
-                ReadKey();
-            }
-        }
-        private static void LoopDisplayImmediately()
-        {
-            while (true)
-            {
                 Deck.Cons.Draw(graph);
                 Deck.ApplyColorValues();
                 graph.Redraw();
+                while (interval - stopwatch.ElapsedMilliseconds > keyReadInterval)
+                {
+                    ReadKey();
+                    Thread.Sleep(keyReadInterval);
+                }
+                stopwatch.Stop();
+                int timeLeft = (int)(interval - stopwatch.ElapsedMilliseconds);
+                if (timeLeft > 0) Thread.Sleep(timeLeft);
                 ReadKey();
                 Deck.NextFrame();
             }
         }
+        private static void DisplaySingle()
+        {
+            Deck.Cons.Draw(graph);
+            Deck.ApplyColorValues();
+            graph.Redraw();
+            while (true) Thread.Sleep(10);
+        }
 
-        private static void CheckKeyCMD(ref bool change_auto)
+        private static void CheckKeyCMD(ref bool toggleAuto)
         {
             ConsoleKey key = Console.ReadKey(true).Key;
             switch (key)
             {
-                case ConsoleKey.Tab: change_auto = true; break;
+                case ConsoleKey.Tab: toggleAuto = true; break;
                 case ConsoleKey.R:
-                    Deck.CurrentFrame = shiftBuffer ? (ushort)0 : (ushort)(Deck.Frames.Length - 1);
+                    Deck.CurrentFrame = (ushort)(Deck.Frames.Length - 1);
                     break;
-                case ConsoleKey.DownArrow:
                 case ConsoleKey.LeftArrow:
                     if (interval > 0) interval--;
                     break;
-                case ConsoleKey.UpArrow:
                 case ConsoleKey.RightArrow:
-                    if (interval < 0xFFFE) interval++;
+                    if (interval < 0xFFFF) interval++;
+                    break;
+                case ConsoleKey.DownArrow:
+                    if (interval > 0) interval >>= 1;
+                    break;
+                case ConsoleKey.UpArrow:
+                    if ((interval << 1) <= 0xFFFF) interval <<= 1;
                     break;
             }
         }
         private static void ReadKey()
         {
-            bool change_auto = false;
-            if (Console.KeyAvailable) CheckKeyCMD(ref change_auto);
-            do_change_auto:
-            if (change_auto)
+            bool toggleAuto = false;
+            if (Console.KeyAvailable) CheckKeyCMD(ref toggleAuto);
+            doAutoToggle:
+            if (toggleAuto)
             {
                 if (auto && (interval != 0)) Console.Title = Caption;
                 auto = !auto;
-                change_auto = false;
+                toggleAuto = false;
             }
             if (!auto)
             {
                 while (Console.KeyAvailable) CleanUpKeyBuffer();
-                CheckKeyCMD(ref change_auto);
-                if (change_auto) goto do_change_auto;
+                CheckKeyCMD(ref toggleAuto);
+                if (toggleAuto) goto doAutoToggle;
             }
             CleanUpKeyBuffer();
         }
@@ -469,6 +464,11 @@ namespace PictureConsoler
         {
             if (!saveConsoledResult) return null;
             string consoledImagePath = $"{path}~{palette}";
+            if (palette != Palette.Classic)
+            {
+                if (PCX.MassColorsDeterminor.UseReducedColors) consoledImagePath += "r";
+                if (PCX.MassColorsDeterminor.IgnoreColorCount) consoledImagePath += "i";
+            }
             if (filter == Filter.Sobel) consoledImagePath += "-sobel";
             else if (filter == Filter.OutlineHighlighting) consoledImagePath += "-ohl";
             if ((filter == Filter.OutlineHighlighting) && OutlineHighlighter.Revesre) consoledImagePath += "r";
@@ -551,27 +551,20 @@ namespace PictureConsoler
                 Stopwatch stopwatch = new Stopwatch();
                 while (true)
                 {
-                    int delta = 0;
                     if (auto) stopwatch.Restart();
+                    NormalizeWinSize();
+                    Shift();
+                    Deck.ApplyColorValues();
+                    while (interval - stopwatch.ElapsedMilliseconds > keyReadInterval)
+                    {
+                        ReadKey();
+                        Thread.Sleep(keyReadInterval);
+                    }
                     stopwatch.Stop();
-                    Deck.NextFrame();
-                    delta = (int)(interval - stopwatch.ElapsedMilliseconds);
-                    if (delta > 0) Thread.Sleep(delta);
-                    NormalizeWinSize();
+                    int timeLeft = (int)(interval - stopwatch.ElapsedMilliseconds);
+                    if (timeLeft > 0) Thread.Sleep(timeLeft);
                     ReadKey();
-                    Shift();
-                    Deck.ApplyColorValues();
-                }
-            }
-            public static void LoopDisplayImmediately()
-            {
-                while (true)
-                {
                     Deck.NextFrame();
-                    NormalizeWinSize();
-                    ReadKey();
-                    Shift();
-                    Deck.ApplyColorValues();
                 }
             }
 

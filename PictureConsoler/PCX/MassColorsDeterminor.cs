@@ -11,6 +11,7 @@ namespace PictureConsoler.PCX
 
         public static bool Use6Threads { get; set; }
         public static bool UseReducedColors { get; set; }
+        public static bool IgnoreColorCount { get; set; }
 
         private readonly IEnumerable<Color> sectors;
         private readonly HashSet<Color> colorSet = new HashSet<Color>();
@@ -75,8 +76,7 @@ namespace PictureConsoler.PCX
         {
             var dealingDict = new Dictionary<Color, double>(colors.Count);
             foreach (var colorPair in colors)
-                dealingDict.Add(colorPair.Key, colorPair.Value);
-                //dealingDict.Add(colorPair.Key, 1.0);
+                dealingDict.Add(colorPair.Key, IgnoreColorCount ? 1.0 : colorPair.Value);
             return dealingDict;
         }
         private Color CalcAverageColor(Dictionary<Color, double> dealingDict)
@@ -224,8 +224,7 @@ namespace PictureConsoler.PCX
                 foreach (Color massColor in massColors)
                 {
                     uint dist2 = CalcDist2(colorPair.Key, massColor);
-                    uint localDelta = (uint)(dist2 * colorPair.Value);
-                    //uint localDelta = dist2;
+                    uint localDelta = IgnoreColorCount ? dist2 : (uint)(dist2 * colorPair.Value);
                     if (localDelta < minLocalDelta) minLocalDelta = localDelta;
                 }
                 delta += minLocalDelta;
