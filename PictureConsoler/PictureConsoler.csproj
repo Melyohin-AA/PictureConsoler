@@ -78,8 +78,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="icon2.ico" />
-    <Content Include="icon3.ico" />
     <Content Include="icon4.ico" />
   </ItemGroup>
   <ItemGroup />

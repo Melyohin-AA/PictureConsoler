@@ -66,5 +66,16 @@ namespace PictureConsoler.PCM
                 foreach (Color sector in BitmapToSectors(precFrame))
                     yield return sector;
         }
+
+        public class MFromImageFactory : FromImageFactory
+        {
+            public MFromImageFactory(byte symbolW, byte symbolH, Image source, Func<Bitmap, Bitmap> filter) :
+                base(symbolW, symbolH, source, filter) { }
+
+            protected override FrameDeck GetNewDeckObject(ushort frameW, ushort frameH, ushort frameCount)
+            {
+                return new MFrameDeck(symbolW, symbolH, frameW, frameH, frameCount);
+            }
+        }
     }
 }

@@ -9,9 +9,6 @@ namespace PictureConsoler
     {
         public const string mark = "PCUF";
 
-        public delegate FrameDeck Constructor(byte symbolW, byte symbolH, ushort frameW, ushort frameH,
-            ushort frameCount);
-
         public Frame[] Frames { get; protected set; }
         public ushort CurrentFrame { get; set; }
         public byte SymbolW { get; }
@@ -147,58 +144,6 @@ namespace PictureConsoler
             return deck;
         }
 
-        public static FrameDeck FromImage(byte symbolW, byte symbolH, Image image,
-            Constructor constructor, Func<Bitmap, Bitmap> filter,
-            string preconsoledResultSavePath, string consoledResultSavePath)
-        {
-            Bitmap[] precFrames = GetPreconsoledFrames(image, filter);
-            FrameDeck deck = CollectFrameDeck(symbolW, symbolH, precFrames, constructor);
-            TrySavePreconsoledResult(preconsoledResultSavePath, precFrames);
-            TrySaveConsoledResult(consoledResultSavePath, deck);
-            return deck;
-        }
-        private static Bitmap[] GetPreconsoledFrames(Image image, Func<Bitmap, Bitmap> filter)
-        {
-            FrameDimension dim = new FrameDimension(image.FrameDimensionsList[0]);
-            ushort frameCount;
-            checked { frameCount = (ushort)image.GetFrameCount(dim); }
-            var precFrames = new Bitmap[frameCount];
-            for (ushort i = 0; i < frameCount; i++)
-            {
-                image.SelectActiveFrame(dim, i);
-                precFrames[i] = new Bitmap(image);
-                if (filter != null) precFrames[i] = filter(precFrames[i]);
-            }
-            return precFrames;
-        }
-        private static FrameDeck CollectFrameDeck(byte symbolW, byte symbolH, Bitmap[] precFrames,
-            Constructor constructor)
-        {
-            ushort frameW = (ushort)(precFrames[0].Width / symbolW), frameH = (ushort)(precFrames[0].Height / symbolH);
-            FrameDeck deck = constructor(symbolW, symbolH, frameW, frameH, (ushort)precFrames.Length);
-            deck.InitFramesFromPreconsoled(precFrames);
-            return deck;
-        }
-        private static void TrySavePreconsoledResult(string preconsoledResultSavePath, Bitmap[] precFrames)
-        {
-            if (preconsoledResultSavePath != null)
-            {
-                if (precFrames.Length > 1)
-                {
-                    GIF_Builder precGifBuilder = new GIF_Builder();
-                    foreach (Bitmap precFrame in precFrames)
-                        precGifBuilder.AddFrame(precFrame);
-                    precGifBuilder.Save(preconsoledResultSavePath + ".gif");
-                }
-                else precFrames[0].Save(preconsoledResultSavePath + ".png", ImageFormat.Png);
-            }
-        }
-        private static void TrySaveConsoledResult(string consoledResultSavePath, FrameDeck deck)
-        {
-            if (consoledResultSavePath != null)
-                deck.SaveConsoled(consoledResultSavePath);
-        }
-
         public byte FillCons(int x, int y, Bitmap bitmap, Color[] colorValues)
         {
             Color upper = GetAverageUpperSectorColor(x, y, bitmap);
@@ -252,6 +197,62 @@ namespace PictureConsoler
                 g += bitmap.GetPixel(ix, iy).G;
                 b += bitmap.GetPixel(ix, iy).B;
             }
+        }
+
+        public abstract class FromImageFactory
+        {
+            protected readonly byte symbolW, symbolH;
+            protected readonly Image source;
+            protected readonly Func<Bitmap, Bitmap> filter;
+
+            public ushort FrameCount { get; private set; }
+            public event Action<Bitmap> PreconsoledFrameProcessedEvent;
+            public event Action<Frame> ConsoledFrameProcessedEvent;
+
+            public FromImageFactory(byte symbolW, byte symbolH, Image source, Func<Bitmap, Bitmap> filter)
+            {
+                if ((symbolW == 0) || (symbolH == 0)) throw new ArgumentOutOfRangeException();
+                this.source = source ?? throw new ArgumentNullException();
+                this.symbolW = symbolW;
+                this.symbolH = symbolH;
+                this.filter = filter;
+            }
+
+            public FrameDeck Create()
+            {
+                Bitmap[] precFrames = GetPreconsoledFrames();
+                FrameDeck deck = CollectFrameDeck(precFrames);
+                return deck;
+            }
+            private Bitmap[] GetPreconsoledFrames()
+            {
+                FrameDimension dim = new FrameDimension(source.FrameDimensionsList[0]);
+                checked { FrameCount = (ushort)source.GetFrameCount(dim); }
+                var precFrames = new Bitmap[FrameCount];
+                for (ushort i = 0; i < FrameCount; i++)
+                {
+                    source.SelectActiveFrame(dim, i);
+                    var precFrame = new Bitmap(source);
+                    if (filter != null) precFrame = filter(precFrame);
+                    PreconsoledFrameProcessedEvent?.Invoke(precFrame);
+                    precFrames[i] = precFrame;
+                }
+                return precFrames;
+            }
+            private FrameDeck CollectFrameDeck(Bitmap[] precFrames)
+            {
+                ushort frameW = (ushort)(precFrames[0].Width / symbolW), frameH = (ushort)(precFrames[0].Height / symbolH);
+                FrameDeck deck = GetNewDeckObject(frameW, frameH, (ushort)precFrames.Length);
+                deck.InitFramesFromPreconsoled(precFrames);
+                if (ConsoledFrameProcessedEvent != null)
+                {
+                    foreach (Frame cFrame in deck.Frames)
+                        ConsoledFrameProcessedEvent(cFrame);
+                }
+                return deck;
+            }
+
+            protected abstract FrameDeck GetNewDeckObject(ushort frameW, ushort frameH, ushort frameCount);
         }
     }
 }

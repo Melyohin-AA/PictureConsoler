@@ -72,5 +72,16 @@ namespace PictureConsoler.Classic
             stream.Close();
             return deck;
         }
+
+        public class ClassicFromImageFactory : FromImageFactory
+        {
+            public ClassicFromImageFactory(byte symbolW, byte symbolH, Image source, Func<Bitmap, Bitmap> filter) :
+                base(symbolW, symbolH, source, filter) { }
+
+            protected override FrameDeck GetNewDeckObject(ushort frameW, ushort frameH, ushort frameCount)
+            {
+                return new ClassicFrameDeck(symbolW, symbolH, frameW, frameH, frameCount);
+            }
+        }
     }
 }

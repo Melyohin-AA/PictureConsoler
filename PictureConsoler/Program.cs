@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
@@ -412,30 +413,27 @@ namespace PictureConsoler
         private static void LoadFrames(string path, byte symbolW, byte symbolH)
         {
             var stopwatch = Stopwatch.StartNew();
-            Image image = Image.FromFile(path);
-            Deck = FrameDeck.FromImage(symbolW, symbolH, image,
-                GetFrameDeckConstructor(), GetFrameFilter(),
-                GetPreconsoledSavePath(path), GetConsoledSavePath(path));
+            Image source = Image.FromFile(path);
+            FrameDeck.FromImageFactory factory = GetFrameDeckFactory(symbolW, symbolH, source);
+            BindFramePreconsoledSavingHandler(factory, path);
+            BindFrameConsoledSavingHandler(factory, path);
+            Deck = factory.Create();
             stopwatch.Stop();
             Console.Write("\nTime elapsed = {0}ms", stopwatch.ElapsedMilliseconds);
         }
-        private static FrameDeck.Constructor GetFrameDeckConstructor()
+        private static FrameDeck.FromImageFactory GetFrameDeckFactory(byte symbolW, byte symbolH, Image source)
         {
-            FrameDeck.Constructor constructor;
+            Func<Bitmap, Bitmap> filter = GetFrameFilter();
             switch (palette)
             {
                 case Palette.Classic:
-                    constructor = (sw, sh, fw, fh, fc) => new Classic.ClassicFrameDeck(sw, sh, fw, fh, fc);
-                    break;
+                    return new Classic.ClassicFrameDeck.ClassicFromImageFactory(symbolW, symbolH, source, filter);
                 case Palette.PCX:
-                    constructor = (sw, sh, fw, fh, fc) => new PCX.XFrameDeck(sw, sh, fw, fh, fc);
-                    break;
+                    return new PCX.XFrameDeck.XFromImageFactory(symbolW, symbolH, source, filter);
                 case Palette.PCM:
-                    constructor = (sw, sh, fw, fh, fc) => new PCM.MFrameDeck(sw, sh, fw, fh, fc);
-                    break;
+                    return new PCM.MFrameDeck.MFromImageFactory(symbolW, symbolH, source, filter);
                 default: throw new Exception();
             }
-            return constructor;
         }
         private static Func<Bitmap, Bitmap> GetFrameFilter()
         {
@@ -453,12 +451,60 @@ namespace PictureConsoler
             }
             return filterF;
         }
+        private static void BindFramePreconsoledSavingHandler(FrameDeck.FromImageFactory factory, string path)
+        {
+            if (!savePreconsoledResult) return;
+            GIF_Builder gifBuilder = null;
+            Bitmap single = null;
+            ushort framesAdded = 0;
+            factory.PreconsoledFrameProcessedEvent += (frame) =>
+            {
+                if (factory.FrameCount > 1)
+                {
+                    if (gifBuilder == null) gifBuilder = new GIF_Builder();
+                    gifBuilder.AddFrame(frame);
+                }
+                else single = frame;
+                framesAdded++;
+                if (framesAdded == factory.FrameCount)
+                {
+                    string precPath = GetPreconsoledSavePath(path);
+                    if (factory.FrameCount > 1)
+                        gifBuilder.Save(precPath + ".gif");
+                    else single.Save(precPath + ".png", ImageFormat.Png);
+                }
+            };
+        }
         private static string GetPreconsoledSavePath(string path)
         {
             if (!savePreconsoledResult) return null;
             string preconsoledImagePath = path + "~" + ((filter == Filter.Sobel) ? "sobel" : "ohl");
             if ((filter == Filter.OutlineHighlighting) && OutlineHighlighter.Revesre) preconsoledImagePath += "r";
             return preconsoledImagePath;
+        }
+        private static void BindFrameConsoledSavingHandler(FrameDeck.FromImageFactory factory, string path)
+        {
+            if (!saveConsoledResult) return;
+            GIF_Builder gifBuilder = null;
+            Bitmap single = null;
+            ushort framesAdded = 0;
+            factory.ConsoledFrameProcessedEvent += (frame) =>
+            {
+                if (factory.FrameCount > 1)
+                {
+                    if (gifBuilder == null) gifBuilder = new GIF_Builder();
+                    gifBuilder.AddFrame(frame.ToBitmap());
+                }
+                else single = frame.ToBitmap();
+                framesAdded++;
+                if (framesAdded == factory.FrameCount)
+                {
+                    string cPath = GetConsoledSavePath(path);
+                    if (factory.FrameCount > 1)
+                        gifBuilder.Save(cPath + ".gif");
+                    else single.Save(cPath + ".png", ImageFormat.Png);
+                }
+            };
         }
         private static string GetConsoledSavePath(string path)
         {

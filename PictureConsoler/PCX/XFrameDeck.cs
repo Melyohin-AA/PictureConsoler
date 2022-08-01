@@ -55,5 +55,16 @@ namespace PictureConsoler.PCX
             stream.Close();
             return deck;
         }
+
+        public class XFromImageFactory : FromImageFactory
+        {
+            public XFromImageFactory(byte symbolW, byte symbolH, Image source, Func<Bitmap, Bitmap> filter) :
+                base(symbolW, symbolH, source, filter) { }
+
+            protected override FrameDeck GetNewDeckObject(ushort frameW, ushort frameH, ushort frameCount)
+            {
+                return new XFrameDeck(symbolW, symbolH, frameW, frameH, frameCount);
+            }
+        }
     }
 }
