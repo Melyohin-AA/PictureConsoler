@@ -3,6 +3,7 @@
 
 <br />
 <div align="center">
+  <p align="right">2019.03.17 - 2022.07.24</p>
   <h2 align="center">Picture Consoler</h2>
   <p align="center">Вывод изображений в консоль Windows</p>
 </div>
