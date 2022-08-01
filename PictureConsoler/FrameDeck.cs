@@ -221,8 +221,7 @@ namespace PictureConsoler
             public FrameDeck Create()
             {
                 Bitmap[] precFrames = GetPreconsoledFrames();
-                FrameDeck deck = CollectFrameDeck(precFrames);
-                return deck;
+                return CollectFrameDeck(precFrames);
             }
             private Bitmap[] GetPreconsoledFrames()
             {
@@ -241,7 +240,8 @@ namespace PictureConsoler
             }
             private FrameDeck CollectFrameDeck(Bitmap[] precFrames)
             {
-                ushort frameW = (ushort)(precFrames[0].Width / symbolW), frameH = (ushort)(precFrames[0].Height / symbolH);
+                ushort frameW = (ushort)(precFrames[0].Width / symbolW);
+                ushort frameH = (ushort)(precFrames[0].Height / symbolH);
                 FrameDeck deck = GetNewDeckObject(frameW, frameH, (ushort)precFrames.Length);
                 deck.InitFramesFromPreconsoled(precFrames);
                 if (ConsoledFrameProcessedEvent != null)
