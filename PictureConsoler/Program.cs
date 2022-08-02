@@ -169,7 +169,7 @@ namespace PictureConsoler
             if (saveConsoledResult)
             {
                 Console.Write("Saving . . . ");
-                string consoledSavePath = GetConsoledSavePath(path);
+                string consoledSavePath = GetSavePath(path, false, (ushort)Deck.Frames.Length);
                 Deck.SaveConsoled(consoledSavePath);
                 Console.WriteLine();
             }
@@ -180,7 +180,7 @@ namespace PictureConsoler
             if (ReadDiscretAnswer())
             {
                 Console.Write("Saving . . . ");
-                string filename = path + Ext;
+                string filename = GenerateUniqueSavePath(path, Ext);
                 Deck.SaveAsPCUF(filename);
                 Console.WriteLine();
             }
@@ -468,19 +468,11 @@ namespace PictureConsoler
                 framesAdded++;
                 if (framesAdded == factory.FrameCount)
                 {
-                    string precPath = GetPreconsoledSavePath(path);
-                    if (factory.FrameCount > 1)
-                        gifBuilder.Save(precPath + ".gif");
-                    else single.Save(precPath + ".png", ImageFormat.Png);
+                    string precPath = GetSavePath(path, true, factory.FrameCount);
+                    if (factory.FrameCount > 1) gifBuilder.Save(precPath);
+                    else single.Save(precPath, ImageFormat.Png);
                 }
             };
-        }
-        private static string GetPreconsoledSavePath(string path)
-        {
-            if (!savePreconsoledResult) return null;
-            string preconsoledImagePath = path + "~" + ((filter == Filter.Sobel) ? "sobel" : "ohl");
-            if ((filter == Filter.OutlineHighlighting) && OutlineHighlighter.Revesre) preconsoledImagePath += "r";
-            return preconsoledImagePath;
         }
         private static void BindFrameConsoledSavingHandler(FrameDeck.FromImageFactory factory, string path)
         {
@@ -499,26 +491,47 @@ namespace PictureConsoler
                 framesAdded++;
                 if (framesAdded == factory.FrameCount)
                 {
-                    string cPath = GetConsoledSavePath(path);
-                    if (factory.FrameCount > 1)
-                        gifBuilder.Save(cPath + ".gif");
-                    else single.Save(cPath + ".png", ImageFormat.Png);
+                    string cPath = GetSavePath(path, false, factory.FrameCount);
+                    if (factory.FrameCount > 1) gifBuilder.Save(cPath);
+                    else single.Save(cPath, ImageFormat.Png);
                 }
             };
         }
-        private static string GetConsoledSavePath(string path)
+        private static string GetSavePath(string path, bool prec, ushort frameCount)
         {
-            if (!saveConsoledResult) return null;
-            string consoledImagePath = $"{path}~{palette}";
-            if (palette != Palette.Classic)
+            if (prec)
             {
-                if (PCX.MassColorsDeterminor.UseReducedColors) consoledImagePath += "r";
-                if (PCX.MassColorsDeterminor.IgnoreColorCount) consoledImagePath += "i";
+                path = $"{path}~{((filter == Filter.Sobel) ? "sobel" : "ohl")}";
+                if ((filter == Filter.OutlineHighlighting) && OutlineHighlighter.Revesre) path += "r";
             }
-            if (filter == Filter.Sobel) consoledImagePath += "-sobel";
-            else if (filter == Filter.OutlineHighlighting) consoledImagePath += "-ohl";
-            if ((filter == Filter.OutlineHighlighting) && OutlineHighlighter.Revesre) consoledImagePath += "r";
-            return consoledImagePath;
+            else
+            {
+                path = $"{path}~{palette}";
+                if (palette != Palette.Classic)
+                {
+                    if (PCX.MassColorsDeterminor.UseReducedColors) path += "r";
+                    if (PCX.MassColorsDeterminor.IgnoreColorCount) path += "i";
+                }
+                if (filter == Filter.Sobel) path += "-sobel";
+                else if (filter == Filter.OutlineHighlighting) path += "-ohl";
+                if ((filter == Filter.OutlineHighlighting) && OutlineHighlighter.Revesre) path += "r";
+            }
+            string ext = (frameCount > 1) ? ".gif" : ".png";
+            return GenerateUniqueSavePath(path, ext);
+        }
+        private static string GenerateUniqueSavePath(string main, string ext)
+        {
+            var file = new FileInfo($"{main}{ext}");
+            if (file.Exists)
+            {
+                for (ulong i = 0; i < ulong.MaxValue; i++)
+                {
+                    file = new FileInfo($"{main}-({i + 1}){ext}");
+                    if (!file.Exists) break;
+                }
+                if (file.Exists) throw new IOException("Failed to generate unique save path!");
+            }
+            return file.FullName;
         }
 
         public static partial class ShiftBuffer

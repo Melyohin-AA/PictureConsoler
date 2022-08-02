@@ -1,9 +1,6 @@
-<div id="top"></div>
-
-
-<br />
 <div align="center">
-  <p align="right">2019.03.17 - 2022.07.24</p>
+  <p align="right">2019.03.17 - 2022.08.02</p>
+  <p align="right">v[1.102.4.1]</p>
   <h2 align="center">Picture Consoler</h2>
   <p align="center">Вывод изображений в консоль Windows</p>
 </div>
