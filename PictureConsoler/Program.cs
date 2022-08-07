@@ -16,6 +16,7 @@ namespace PictureConsoler
         public const string Caption = "Picture Consoler";
         public const short Buff = 0x7FFF;
         private const short keyReadInterval = 50;
+        private static System.Globalization.CultureInfo culture = new System.Globalization.CultureInfo("en-UK");
 
         public static FrameDeck Deck { get; private set; }
         private static bool auto = false, shiftBuffer = false;
@@ -108,7 +109,7 @@ namespace PictureConsoler
                 Console.WriteLine();
                 TrySaveAsPCUFOption(path);
             }
-            Console.WriteLine("Frame count : " + Deck.Frames.Length);
+            Console.WriteLine("Frame count: " + Deck.Frames.Length);
             if (IsExtSpecial(fileExt))
             {
                 TrySaveConsoledOption(path);
@@ -116,7 +117,7 @@ namespace PictureConsoler
             }
             if (Deck.Frames.Length > 1)
             {
-                Console.Write("Inerval (0-65535 in ms) : ");
+                Console.Write("Inerval (0-65535 in ms): ");
                 interval = ReadDB_Interval();
                 ShiftBuffer.CalcColumnRow();
                 if (ShiftBuffer.ModeOpportunity)
@@ -214,6 +215,7 @@ namespace PictureConsoler
                 case ConsoleKey.F3:
                     filter = Filter.Sobel;
                     ReadSobelCap();
+                    ReadSobelGrayscaleAsHueOption();
                     ReadFlagSavePreconsoledResult();
                     break;
                 case ConsoleKey.F5:
@@ -253,23 +255,29 @@ namespace PictureConsoler
         {
             SobelFilter.SobelCap = ReadDoubleParameter("Cap of sobel-value", 1.0, 0.5, 4.0);
         }
-        private static double ReadDoubleParameter(string message, double default_value,
-            double lower_limit, double upper_limit)
+        private static void ReadSobelGrayscaleAsHueOption()
         {
-            message = $"{message} {{{lower_limit.SmartToString()} - {upper_limit.SmartToString()}/default {default_value.SmartToString()}}} : ";
+            Console.Write("Interpret grayscale as hue? {Y/N} ");
+            SobelFilter.GrayscaleAsHue = ReadDiscretAnswer();
+        }
+        private static double ReadDoubleParameter(string message, double defaultValue,
+            double lowerValue, double upperValue)
+        {
+            string sLowerValue = lowerValue.SmartToString(), sUpperValue = upperValue.SmartToString();
+            message = $"{message} {{{sLowerValue} - {sUpperValue}/default {defaultValue.SmartToString()}}}: ";
             Console.Write(message);
             double result;
             while (true)
             {
                 string input = Console.ReadLine();
-                if (input.Length == 0) return default_value;
-                if (!double.TryParse(input.Replace('.', ','), out result))
+                if (input.Length == 0) return defaultValue;
+                if (!double.TryParse(input, System.Globalization.NumberStyles.Float, culture, out result))
                 {
-                    Console.Write("Parsing failed. Correct : ");
+                    Console.Write("Parsing failed. Correct: ");
                     continue;
                 }
-                if ((result >= lower_limit) && (result <= upper_limit)) return result;
-                Console.Write("Value is out of range. Correct : ");
+                if ((result >= lowerValue) && (result <= upperValue)) return result;
+                Console.Write("Value is out of range. Correct: ");
             }
         }
 

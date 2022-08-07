@@ -8,6 +8,7 @@ namespace PictureConsoler
         private const byte grayscaleGradientPhaseCount = 7;
         private static double[,] SX = new double[,] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
 
+        public static bool GrayscaleAsHue;
         public static double SobelCap = 1.0;
 
         private static Color[] grayscaleGradient;
@@ -68,8 +69,13 @@ namespace PictureConsoler
         }
         private static Color GetColorFromGrayscale(double grayscale)
         {
-            short hue = (short)(grayscale * 255 * grayscaleGradientPhaseCount);
-            return grayscaleGradient[hue];
+            if (GrayscaleAsHue)
+            {
+                short hue = (short)(grayscale * 255 * grayscaleGradientPhaseCount);
+                return grayscaleGradient[hue];
+            }
+            int value = (int)(grayscale * 255);
+            return Color.FromArgb(value, value, value);
         }
 
         public static Bitmap Filter(Bitmap original)
