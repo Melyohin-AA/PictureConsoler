@@ -520,9 +520,16 @@ namespace PictureConsoler
                     if (PCX.MassColorsDeterminor.UseReducedColors) path += "r";
                     if (PCX.MassColorsDeterminor.IgnoreColorCount) path += "i";
                 }
-                if (filter == Filter.Sobel) path += "-sobel";
-                else if (filter == Filter.OutlineHighlighting) path += "-ohl";
-                if ((filter == Filter.OutlineHighlighting) && OutlineHighlighter.Revesre) path += "r";
+                if (filter == Filter.Sobel)
+                {
+                    path += "-sobel";
+                    if (SobelFilter.GrayscaleAsHue) path += "h";
+                }
+                else if (filter == Filter.OutlineHighlighting)
+                {
+                    path += "-ohl";
+                    if (OutlineHighlighter.Revesre) path += "r";
+                }
             }
             string ext = (frameCount > 1) ? ".gif" : ".png";
             return GenerateUniqueSavePath(path, ext);

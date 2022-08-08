@@ -69,16 +69,14 @@ namespace PictureConsoler
         public Color[,] BitmapToSectors(Bitmap bitmap)
         {
             Color[,] sectors = new Color[FrameW, FrameH << 1];
-            int x = 0, y = 0;
-            for (int ix = SymbolW; ix < bitmap.Width; ix += SymbolW)
+            for (ushort i = 0; i < FrameH; i++)
             {
-                for (int iy = SymbolH; iy < bitmap.Height; iy += SymbolH)
+                for (ushort j = 0; j < FrameW; j++)
                 {
-                    sectors[x, y++] = GetAverageUpperSectorColor(ix - SymbolW, iy - SymbolH, bitmap);
-                    sectors[x, y++] = GetAverageLowerSectorColor(ix - SymbolW, iy - SymbolH, bitmap);
+                    int x = j * SymbolW, y = i * SymbolH;
+                    sectors[j, i << 1] = GetAverageUpperSectorColor(x, y, bitmap);
+                    sectors[j, (i << 1) + 1] = GetAverageLowerSectorColor(x, y, bitmap);
                 }
-                x++;
-                y = 0;
             }
             return sectors;
         }

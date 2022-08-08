@@ -11,15 +11,13 @@ namespace PictureConsoler.Classic
 
         public override void FillColors(Bitmap bitmap)
         {
-            int limX = bitmap.Width - Deck.SymbolW, limY = bitmap.Height - Deck.SymbolH;
-            ushort x = 0, y = 0;
-            for (int ix = 0; ix <= limX; ix += Deck.SymbolW)
+            for (ushort i = 0; i < Deck.FrameH; i++)
             {
-                for (int iy = 0; iy <= limY; iy += Deck.SymbolH)
-                    colors[x, y++] = Deck.FillCons(ix, iy, bitmap,
-                        ClassicFrameDeck.colorValues);
-                x++;
-                y = 0;
+                for (ushort j = 0; j < Deck.FrameW; j++)
+                {
+                    int x = j * Deck.SymbolW, y = i * Deck.SymbolH;
+                    colors[j, i] = Deck.FillCons(x, y, bitmap, ClassicFrameDeck.colorValues);
+                }
             }
         }
     }

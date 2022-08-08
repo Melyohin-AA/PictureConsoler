@@ -55,9 +55,9 @@ namespace PictureConsoler.PCX
         }
         private void FillColorsX(Color[,] sectors)
         {
-            for (int i = 0; i < Deck.FrameH; i++)
+            for (ushort i = 0; i < Deck.FrameH; i++)
             {
-                for (int j = 0; j < Deck.FrameW; j++)
+                for (ushort j = 0; j < Deck.FrameW; j++)
                 {
                     byte ui = (byte)FrameDeck.GetNearestConsoleColor(sectors[j, i << 1], colorValues);
                     byte li = (byte)FrameDeck.GetNearestConsoleColor(sectors[j, (i << 1) + 1], colorValues);
