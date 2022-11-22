@@ -30,8 +30,6 @@ The project is an application designed to output pictures in different variants 
 * `.NET Framework 4.7.2`
 * `Console Application`
 
-![product-screenshot](https://github.com/Melyohin-AA/PictureConsoler/raw/master/_ReadmeFiles/product-screenshot.png)
-
 
 ### Usage
 
@@ -57,4 +55,4 @@ The project is an application designed to output pictures in different variants 
 ### Demo
 
 Picture gallery:<br/>
-[![Demo](https://github.com/Melyohin-AA/PictureConsoler/raw/master/_ReadmeFiles/Gallery.gif)](https://drive.google.com/drive/folders/14Gxi2ahGzbZTBQqTF1I1Mo_9dbcLqTxh)
+[![Demo](https://github.com/Melyohin-AA/PictureConsoler/raw/master/_ReadmeFiles/product-screenshot.png)](https://drive.google.com/drive/folders/14Gxi2ahGzbZTBQqTF1I1Mo_9dbcLqTxh)
