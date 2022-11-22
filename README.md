@@ -54,5 +54,5 @@ The project is an application designed to output pictures in different variants 
 
 ### Demo
 
-Picture gallery:<br/>
+<a href="https://drive.google.com/drive/folders/14Gxi2ahGzbZTBQqTF1I1Mo_9dbcLqTxh">Picture gallery:</a><br/>
 [![Demo](https://github.com/Melyohin-AA/PictureConsoler/raw/master/_ReadmeFiles/product-screenshot.png)](https://drive.google.com/drive/folders/14Gxi2ahGzbZTBQqTF1I1Mo_9dbcLqTxh)
