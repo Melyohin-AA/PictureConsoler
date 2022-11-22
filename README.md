@@ -13,7 +13,7 @@
 
 The project is an application designed to output pictures in different variants to the Windows console.
 
-##### Features:
+#### Features:
 * Support of different formats of source image (BMP, PNG, JPEG, TIFF, GIF)
 * Support of different raster fonts (4x6, 16x8, 6x9, 8x9, 5x12, 7x12, 8x12, 16x12, 12x16, 10x18)
 * Replaying GIF-animations
@@ -22,10 +22,10 @@ The project is an application designed to output pictures in different variants 
 * Writing processed images in PCUF files
 * Reading files in PCUF format and obsolete PCFF and PCXF formats
 * Convertion files from PCUF format to PNG or GIF format
-* option to specify the source file path with command-line arguments
-* Target OS - Windows 10
+* Option to specify the source file path with command-line arguments
+* Target OS – Windows 10
 
-##### Technology stack:
+#### Technology stack:
 * `C#`
 * `.NET Framework 4.7.2`
 * `Console Application`
@@ -39,7 +39,7 @@ The project is an application designed to output pictures in different variants 
 4. Select options of image processing/displaying/replaying/writing
 5. Wait while the image is being rendered
 
-##### Notice:
+#### Notice:
 1. It is necessary to choose `Raster Fonts` as a font in the Command Prompt settings
 2. Using of the `Use legacy console` option in the Command Prompt settings is recommended
 3. After source image is loaded and processed it is divided into rectangular pieces which width is equal to the font's one, and which height is equal to a half of font's one (half cell symbol is used for image displaying)
