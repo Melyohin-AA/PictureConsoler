@@ -29,7 +29,8 @@ namespace PictureConsoler
             get
             {
                 ConsoleFont[] fonts = new ConsoleFont[GetNumberOfConsoleFonts()];
-                if (fonts.Length > 0) GetConsoleFontInfo(GetStdHandle(StdHandle.OutputHandle), false, (uint)fonts.Length, fonts);
+                if (fonts.Length > 0) GetConsoleFontInfo(GetStdHandle(StdHandle.OutputHandle), false,
+                    (uint)fonts.Length, fonts);
                 return fonts;
             }
         }
