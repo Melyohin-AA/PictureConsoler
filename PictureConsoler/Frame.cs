@@ -8,7 +8,7 @@ namespace PictureConsoler
 {
     abstract class Frame
     {
-        public const char symbol = '\x00DC';//'\x2584';
+        public const char symbol = '▄';//'\x2584';//'\x00DC';
 
         public FrameDeck Deck { get; }
         protected byte[,] colors;
@@ -16,7 +16,7 @@ namespace PictureConsoler
         {
             get { return colors[x, y]; }
         }
-        
+
         protected Frame(FrameDeck deck)
         {
             Deck = deck;

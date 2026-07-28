@@ -12,7 +12,7 @@ namespace PictureConsoler
 {
     class Program
     {
-        public const string Ext = ".pcuf", OldClassicExt = ".pcff", OldXExt = ".pcxf";
+        public const string Ext = ".pcuf", OldClassicExt = ".pcff", OldXExt = ".pcxf", MclExt = ".pcml";
         public const string Caption = "Picture Consoler";
         public const short Buff = 0x7FFF;
         private const short keyReadInterval = 50;
@@ -26,6 +26,7 @@ namespace PictureConsoler
         private static Palette palette;
         private static double ohlCompressFactor, ohlDivisionFactor;
         private static bool savePreconsoledResult, saveConsoledResult;
+        private static string sourcePath;
 
         private static ConsoleGraphics graph;
 
@@ -33,7 +34,7 @@ namespace PictureConsoler
         {
             Console.Title = Caption;
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.InputEncoding = Console.OutputEncoding = System.Text.Encoding.UTF8;
+            //Console.InputEncoding = Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.Clear();
             Console.CursorSize = 50;
             ConsoleColors.TryApplyColorValues();
@@ -68,23 +69,25 @@ namespace PictureConsoler
         {
             Console.CursorVisible = true;
             Console.Write("File path: ");
-            string path;
-            if (args.Length == 0) path = ReadBMP_Path();
+            if (args.Length == 0)
+                sourcePath = ReadBMP_Path();
             else
             {
-                path = args[0];
-                Console.WriteLine(path);
+                sourcePath = args[0];
+                Console.WriteLine(sourcePath);
             }
             byte pw, ph, fontIndex = 255;
-            FileInfo info = new FileInfo(path);
+            FileInfo info = new FileInfo(sourcePath);
             Console.Title = $"{info.Name} - {Console.Title}";
             string fileExt = info.Extension.ToLower();
             if (IsExtSpecial(fileExt))
             {
                 Console.Write("Loading  . . . ");
-                if (fileExt == OldClassicExt) Deck = Classic.ClassicFrameDeck.LoadAsPCFF(path);
-                else if (fileExt == OldXExt) Deck = PCX.XFrameDeck.LoadAsPCXF(path);
-                else Deck = FrameDeck.LoadAsPCUF(path);
+                if (fileExt == OldClassicExt)
+                    Deck = Classic.ClassicFrameDeck.LoadAsPCFF(sourcePath);
+                else if (fileExt == OldXExt)
+                    Deck = PCX.XFrameDeck.LoadAsPCXF(sourcePath);
+                else Deck = FrameDeck.LoadAsPCUF(sourcePath);
                 palette = Deck.GetPalette();
                 Console.WriteLine();
                 pw = Deck.SymbolW;
@@ -95,7 +98,8 @@ namespace PictureConsoler
                     fontIndex = (byte)font.Index;
                     break;
                 }
-                if (fontIndex == 255) ReadSymbolSize(out pw, out ph, out fontIndex);
+                if (fontIndex == 255)
+                    ReadSymbolSize(out pw, out ph, out fontIndex);
                 else Console.WriteLine("Font #{0}: {1}x{2}", fontIndex, pw, ph);
             }
             else
@@ -105,15 +109,16 @@ namespace PictureConsoler
                 ReadPaletteSelection();
                 ReadFlagSaveConsoledResult();
                 Console.Write("Loading and fragmentation . . . ");
-                LoadFrames(path, pw, ph);
+                LoadFrames(sourcePath, pw, ph);
                 Console.WriteLine();
-                TrySaveAsPCUFOption(path);
+                TrySaveAsPCUFOption(sourcePath);
             }
             Console.WriteLine("Frame count: " + Deck.Frames.Length);
             if (IsExtSpecial(fileExt))
             {
-                TrySaveConsoledOption(path);
-                if (fileExt != Ext) TrySaveAsPCUFOption(path);
+                TrySaveConsoledOption(sourcePath);
+                if (fileExt != Ext)
+                    TrySaveAsPCUFOption(sourcePath);
             }
             if (Deck.Frames.Length > 1)
             {
@@ -204,6 +209,12 @@ namespace PictureConsoler
                 PCX.MassColorsDeterminor.UseReducedColors = ReadDiscretAnswer();
                 Console.Write("Ignore one color sectors count? {Y/N} ");
                 PCX.MassColorsDeterminor.IgnoreColorCount = ReadDiscretAnswer();
+                Console.Write("Write the MassColorsDeterminor logs? {Y/N} ");
+                if (ReadDiscretAnswer())
+                {
+                    string mcdLoggerDest = GenerateUniqueSavePath(sourcePath, MclExt);
+                    PCX.MassColorsDeterminor.Logger = new Commons.PCX.MassLogger(mcdLoggerDest);
+                }
             }
         }
 

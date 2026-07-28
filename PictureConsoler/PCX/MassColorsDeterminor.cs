@@ -12,11 +12,13 @@ namespace PictureConsoler.PCX
         public static bool Use6Threads { get; set; }
         public static bool UseReducedColors { get; set; }
         public static bool IgnoreColorCount { get; set; }
+        public static Commons.PCX.MassLogger Logger { get; set; }
 
         private readonly IEnumerable<Color> sectors;
         private readonly HashSet<Color> colorSet = new HashSet<Color>();
         private readonly Dictionary<Color, int> colors = new Dictionary<Color, int>();
         private readonly Color[] massColors = new Color[massColorCount];
+        private readonly byte[] dirs = new byte[massColorCount];
         private ulong delta, minDelta;
 
         public MassColorsDeterminor(IEnumerable<Color> sectors)
@@ -33,8 +35,10 @@ namespace PictureConsoler.PCX
             else
             {
                 DoMassDeal();
+                Logger?.Start(UseReducedColors, IgnoreColorCount, minDelta, massColors);
                 if (Use6Threads) DoMassDescent6T();
                 else DoMassDescent();
+                Logger?.Stop();
             }
             //return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.OrderBy(massColors, c => c.ToArgb));
             return (Color[])massColors.Clone();
@@ -64,6 +68,7 @@ namespace PictureConsoler.PCX
 
         private void DoMassDeal()
         {
+            // I hate mass deal. It's so bad. At least it is relatively fast
             var dealingDict = CollectDealingDict();
             for (byte i = 0; i < massColorCount; i++)
             {
@@ -116,6 +121,7 @@ namespace PictureConsoler.PCX
             do
             {
                 DoMassDescentIteration(out haveChanges);
+                Logger?.Log(minDelta, dirs);
             } while (haveChanges);
         }
         private void DoMassDescentIteration(out bool haveChanges)
@@ -124,9 +130,10 @@ namespace PictureConsoler.PCX
             for (byte i = 0; i < massColorCount; i++)
             {
                 Color oldMC = massColors[i], minMC = oldMC, newMC;
+                byte minMCJ = 6; // no dir
                 for (byte j = 0; j < 6; j++)
                 {
-                    newMC = ModifyMassColor(oldMC, j);
+                    newMC = Commons.PCX.Mass.ModifyMassColor(oldMC, j);
                     if (newMC == Color.Empty) continue;
                     massColors[i] = newMC;
                     ulong newDeltaOfIteration = CalcDelta();
@@ -134,10 +141,12 @@ namespace PictureConsoler.PCX
                     {
                         minDelta = newDeltaOfIteration;
                         minMC = newMC;
+                        minMCJ = j;
                         haveChanges = true;
                     }
                 }
                 massColors[i] = minMC;
+                dirs[i] = minMCJ;
             }
             delta = minDelta;
         }
@@ -152,6 +161,7 @@ namespace PictureConsoler.PCX
             do
             {
                 DoMassDescentIteration6T(deltas, newMCs, threads, out haveChanges);
+                Logger?.Log(minDelta, dirs);
             } while (haveChanges);
         }
         private void DoMassDescentIteration6T(ulong[] deltas, Color[] newMCs, Thread[] threads, out bool haveChanges)
@@ -160,11 +170,13 @@ namespace PictureConsoler.PCX
             for (byte i = 0; i < massColorCount; i++)
             {
                 Color oldMC = massColors[i], minMC = oldMC;
+                byte minMCJ = 6; // no dir
                 for (byte j = 0; j < six; j++)
                 {
                     deltas[j] = ulong.MaxValue;
-                    newMCs[j] = ModifyMassColor(oldMC, j);
+                    newMCs[j] = Commons.PCX.Mass.ModifyMassColor(oldMC, j);
                     if (newMCs[j] == Color.Empty) continue;
+                    // TODO: Stop creating threads!
                     threads[j] = new Thread((j_) =>
                     {
                         var modifiedMassColors = (Color[])massColors.Clone();
@@ -181,38 +193,14 @@ namespace PictureConsoler.PCX
                     {
                         minDelta = deltas[j];
                         minMC = newMCs[j];
+                        minMCJ = j;
                         haveChanges = true;
                     }
                 }
                 massColors[i] = minMC;
+                dirs[i] = minMCJ;
             }
             delta = minDelta;
-        }
-
-        private Color ModifyMassColor(Color oldMC, byte j)
-        {
-            switch (j)
-            {
-                case 0:
-                    if (oldMC.R == 0) return Color.Empty;
-                    return Color.FromArgb(oldMC.R - 1, oldMC.G, oldMC.B);
-                case 1:
-                    if (oldMC.R == 255) return Color.Empty;
-                    return Color.FromArgb(oldMC.R + 1, oldMC.G, oldMC.B);
-                case 2:
-                    if (oldMC.G == 0) return Color.Empty;
-                    return Color.FromArgb(oldMC.R, oldMC.G - 1, oldMC.B);
-                case 3:
-                    if (oldMC.G == 255) return Color.Empty;
-                    return Color.FromArgb(oldMC.R, oldMC.G + 1, oldMC.B);
-                case 4:
-                    if (oldMC.B == 0) return Color.Empty;
-                    return Color.FromArgb(oldMC.R, oldMC.G, oldMC.B - 1);
-                case 5:
-                    if (oldMC.B == 255) return Color.Empty;
-                    return Color.FromArgb(oldMC.R, oldMC.G, oldMC.B + 1);
-            }
-            throw new Exception();
         }
 
         private ulong CalcDelta(Color[] massColors)

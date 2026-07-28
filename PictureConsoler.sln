@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36301.6 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PictureConsoler", "PictureConsoler\PictureConsoler.csproj", "{27A7711F-28DA-4C9B-9B98-72D40084AFCE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PictureConsolerCommons", "PictureConsolerCommons\PictureConsolerCommons.csproj", "{EADAB1A2-18AC-476B-BC3C-C8D40D9EF590}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PictureConsolerMassVisualizer", "PictureConsolerMassVisualizer\PictureConsolerMassVisualizer.csproj", "{5D5942A3-910F-4C64-AB2A-815ACD242FF5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +19,19 @@ Global
 		{27A7711F-28DA-4C9B-9B98-72D40084AFCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27A7711F-28DA-4C9B-9B98-72D40084AFCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27A7711F-28DA-4C9B-9B98-72D40084AFCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EADAB1A2-18AC-476B-BC3C-C8D40D9EF590}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EADAB1A2-18AC-476B-BC3C-C8D40D9EF590}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EADAB1A2-18AC-476B-BC3C-C8D40D9EF590}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EADAB1A2-18AC-476B-BC3C-C8D40D9EF590}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D5942A3-910F-4C64-AB2A-815ACD242FF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D5942A3-910F-4C64-AB2A-815ACD242FF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D5942A3-910F-4C64-AB2A-815ACD242FF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D5942A3-910F-4C64-AB2A-815ACD242FF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {398E4FA8-45B4-476C-97EB-EAB700173E5E}
 	EndGlobalSection
 EndGlobal
