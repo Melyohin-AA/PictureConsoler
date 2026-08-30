@@ -1,5 +1,5 @@
 <div align="center">
-  <p align="right">v[1.102.4.5]</p>
+  <p align="right">v[1.104.0.0]</p>
   <h2 align="center">Picture Consoler</h2>
   <p align="center">Display pictures in the Windows console</p>
 </div>
@@ -52,7 +52,6 @@ The project is an application designed to output pictures in different variants 
   * `Arrows` - varying of an autoplay interval (left/right - dec/inc by 1ms, down/up - dec/inc in 2 times)
 7. Palette switching requires extra time, so it is recommended to use PCM mode instead of PCX for GIF autoplaying
 
-### Demo
+<hr>
 
-<a href="https://drive.google.com/drive/folders/14Gxi2ahGzbZTBQqTF1I1Mo_9dbcLqTxh">Picture gallery:</a><br/>
 [![Demo](https://github.com/Melyohin-AA/PictureConsoler/raw/master/_ReadmeFiles/product-screenshot.png)](https://drive.google.com/drive/folders/14Gxi2ahGzbZTBQqTF1I1Mo_9dbcLqTxh)
