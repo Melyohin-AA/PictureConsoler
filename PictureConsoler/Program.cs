@@ -5,7 +5,6 @@ using System.IO;
 using System.Diagnostics;
 using System.Threading;
 using System.Collections.Generic;
-using ConsoleGraphicsLib;
 using ConsoleColorsLib;
 
 namespace PictureConsoler
@@ -27,8 +26,6 @@ namespace PictureConsoler
         private static double ohlCompressFactor, ohlDivisionFactor;
         private static bool savePreconsoledResult, saveConsoledResult;
         private static string sourcePath;
-
-        private static ConsoleGraphics graph;
 
         private static void Init()
         {
@@ -337,8 +334,8 @@ namespace PictureConsoler
             if (shiftBuffer) ShiftBuffer.SetBufferSize();
             else
             {
-                graph = new ConsoleGraphics(Deck.FrameW, Deck.FrameH, new ScreenCell(Frame.symbol, 0, false));
                 Console.SetBufferSize(Deck.FrameW + 1, Deck.FrameH + 1);
+                ConsoleUpdater.Init((short)Deck.FrameW, (short)Deck.FrameH);
             }
             Console.WindowWidth = Math.Min(Deck.FrameW, (ushort)20);
             Console.Clear();
@@ -358,9 +355,9 @@ namespace PictureConsoler
             while (true)
             {
                 if (auto) stopwatch.Restart();
-                Deck.Cons.Draw(graph);
+                Deck.Cons.Draw();
                 Deck.ApplyColorValues();
-                graph.Redraw();
+                ConsoleUpdater.Flush();
                 while (interval - stopwatch.ElapsedMilliseconds > keyReadInterval)
                 {
                     ReadKey();
@@ -375,9 +372,9 @@ namespace PictureConsoler
         }
         private static void DisplaySingle()
         {
-            Deck.Cons.Draw(graph);
+            Deck.Cons.Draw();
             Deck.ApplyColorValues();
-            graph.Redraw();
+            ConsoleUpdater.Flush();
             while (true) Thread.Sleep(10);
         }
 
@@ -624,7 +621,7 @@ namespace PictureConsoler
                         Console.CursorLeft += Deck.FrameW;
                         Console.CursorTop = i = 0;
                     }
-                    frame.Draw();
+                    frame.Print();
                     i++;
                 }
                 NormalizeWinSize();

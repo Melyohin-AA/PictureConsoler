@@ -41,10 +41,6 @@
     <Reference Include="ConsoleColorsLib">
       <HintPath>..\_Libs\ConsoleColorsLib.dll</HintPath>
     </Reference>
-    <Reference Include="ConsoleGraphicsLib, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\_Libs\ConsoleGraphicsLib.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -60,6 +56,7 @@
   <ItemGroup>
     <Compile Include="Classic\ClassicFrame.cs" />
     <Compile Include="Classic\ClassicFrameDeck.cs" />
+    <Compile Include="ConsoleUpdater.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FontSelector.cs" />
     <Compile Include="Frame.cs" />

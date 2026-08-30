@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using ConsoleGraphicsLib;
 using System.IO;
 using System.Collections.Generic;
 
@@ -33,13 +32,13 @@ namespace PictureConsoler
 
         public abstract void FillColors(Bitmap bitmap);
 
-        public virtual void Draw(ConsoleGraphics graph)
-        {
-            for (ushort iy = 0; iy < Deck.FrameH; iy++)
-                for (ushort ix = 0; ix < Deck.FrameW; ix++)
-                    graph.Screen[ix, iy].Color = colors[ix, iy];
-        }
         public virtual void Draw()
+        {
+            for (short iy = 0; iy < Deck.FrameH; iy++)
+                for (short ix = 0; ix < Deck.FrameW; ix++)
+                    ConsoleUpdater.SetCell(ix, iy, new ConsoleUpdater.Color(colors[ix, iy]));
+        }
+        public virtual void Print()
         {
             for (ushort iy = 0; iy < Deck.FrameH; iy++)
             {
