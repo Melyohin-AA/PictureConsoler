@@ -6,10 +6,13 @@ namespace PictureConsoler.Commons.PCX
 {
 	public sealed class MassLogger
 	{
-		public const string mark = "PCML";
+		public const string mark = "PCLM";
+		public const byte version = 1;
 		public const byte batchSize = 16;// MassColorsDeterminor.massColorCount;
 
 		private readonly string dest;
+		private long frameCountAddress;
+		private ushort frameCount;
 		private FileStream stream;
 		private BinaryWriter writer;
 		private long batchCountAddress;
@@ -20,22 +23,37 @@ namespace PictureConsoler.Commons.PCX
 			this.dest = dest ?? throw new ArgumentNullException(nameof(dest));
 		}
 
-		public void Start(bool useReducedColors, bool ignoreColorCount, ulong minDelta, Color[] massColors)
+		public void StartFrame(bool useReducedColors, bool ignoreColorCount, ulong minDelta, Color[] massColors)
 		{
-			if (stream != null)
-				throw new InvalidOperationException();
 			if (massColors.Length != batchSize)
 				throw new ArgumentOutOfRangeException(nameof(massColors));
+			if (stream != null)
+				FinishFrame();
+			else Init();
+			WriteFlags(useReducedColors, ignoreColorCount);
+			writer.Write(minDelta);
+			WriteMassColors(massColors);
+			batchCountAddress = stream.Position;
+			writer.Write(0L); // space for batch count
+			frameCount++;
+		}
+		private void Init()
+		{
 			stream = new FileStream(dest, FileMode.OpenOrCreate);
 			stream.SetLength(0L);
 			writer = new BinaryWriter(stream);
 			writer.Write(mark.ToCharArray());
-			WriteFlags(useReducedColors, ignoreColorCount);
-			writer.Write(batchSize);
-			writer.Write(minDelta);
-			WriteMassColors(massColors);
-			batchCountAddress = stream.Position;
-			writer.Write(0L); // batch count
+			writer.Write(version);
+			frameCountAddress = stream.Position;
+			writer.Write((ushort)0); // space for frame count
+		}
+		private void FinishFrame()
+		{
+			long pos = stream.Position;
+			stream.Position = batchCountAddress;
+			writer.Write(batchCount);
+			stream.Position = pos;
+			batchCount = 0L;
 		}
 		private void WriteFlags(bool useReducedColors, bool ignoreColorCount)
 		{
@@ -79,9 +97,10 @@ namespace PictureConsoler.Commons.PCX
 		public void Stop()
 		{
 			if (stream == null)
-				throw new InvalidOperationException();
-			stream.Position = batchCountAddress;
-			writer.Write(batchCount);
+				throw new InvalidOperationException("Stream not initiallized");
+			FinishFrame();
+			stream.Position = frameCountAddress;
+			writer.Write(frameCount);
 			writer.Close();
 			writer = null;
 			stream.Close();

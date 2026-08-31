@@ -1,5 +1,5 @@
 <div align="center">
-  <p align="right">v[1.104.0.0]</p>
+  <p align="right">v[1.104.1]</p>
   <h2 align="center">Picture Consoler</h2>
   <p align="center">Display pictures in the Windows console</p>
 </div>
@@ -54,4 +54,4 @@ The project is an application designed to output pictures in different variants 
 
 <hr>
 
-[![Demo](https://github.com/Melyohin-AA/PictureConsoler/raw/master/_ReadmeFiles/product-screenshot.png)](https://drive.google.com/drive/folders/14Gxi2ahGzbZTBQqTF1I1Mo_9dbcLqTxh)
+![Demo](https://github.com/Melyohin-AA/PictureConsoler/raw/master/_ReadmeFiles/product-screenshot.png)

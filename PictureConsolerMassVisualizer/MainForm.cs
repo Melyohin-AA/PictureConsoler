@@ -18,13 +18,13 @@ namespace PictureConsoler.MassVisualizer
 		//	Color.FromArgb(xb, xd, 0), Color.FromArgb(xb, xb, xb),
 		//};
 
-		private readonly Projector projector = new Projector();
+		private Projector projector = new Projector();
 		private readonly Commons.PCX.MassReader massReader;
 
 		public MainForm()
 		{
 			InitializeComponent();
-			var dialog = new OpenFileDialog { Filter = "PC Mass Logs (*.pcml)|*.pcml" };
+			var dialog = new OpenFileDialog { Filter = "PC Mass Logs (*.pclm)|*.pclm" };
 			if (dialog.ShowDialog() != DialogResult.OK)
 			{
 				Close();
@@ -44,18 +44,36 @@ namespace PictureConsoler.MassVisualizer
 		protected override void OnKeyPress(KeyPressEventArgs e)
 		{
 			base.OnKeyPress(e);
-			if (massReader.Index < massReader.BatchCount)
+			if (massReader.BatchIndex < massReader.BatchCount)
 			{
-				massReader.Next();
-				ShowInfo();
-				DrawMassColors(massReader.Index < massReader.BatchCount - 1);
-				Invalidate();
+				if (e.KeyChar == '\r')
+				{
+					// skipping to the next frame
+					while (massReader.BatchIndex < massReader.BatchCount)
+					{
+						massReader.NextBatch();
+						DrawMassColors(massReader.BatchIndex < massReader.BatchCount);
+					}
+				}
+				else
+				{
+					// showing batch by batch
+					massReader.NextBatch();
+					DrawMassColors(massReader.BatchIndex < massReader.BatchCount);
+				}
 			}
+			else if (massReader.FrameIndex < massReader.FrameCount)
+			{
+				massReader.NextFrame();
+				projector = new Projector();
+			}
+			ShowInfo();
+			Invalidate();
 		}
 
 		private void DrawMassColors(bool asPixels)
 		{
-			for (int i = 0; i < massReader.BatchSize; i++)
+			for (int i = 0; i < Commons.PCX.MassLogger.batchSize; i++)
 			{
 				Color mc = massReader.MassColors[i];
 				if (asPixels)
@@ -66,7 +84,8 @@ namespace PictureConsoler.MassVisualizer
 
 		private void ShowInfo()
 		{
-			Text = $"{CaptionBase} index={massReader.Index}/{massReader.BatchCount} delta={massReader.MinDelta}";
+			Text = $"{CaptionBase} frame={massReader.FrameIndex}/{massReader.FrameCount} " +
+				$"batch={massReader.BatchIndex}/{massReader.BatchCount} delta={massReader.MinDelta}";
 		}
 	}
 }

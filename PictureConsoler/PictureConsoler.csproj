@@ -61,7 +61,7 @@
     <Compile Include="FontSelector.cs" />
     <Compile Include="Frame.cs" />
     <Compile Include="FrameDeck.cs" />
-    <Compile Include="GIF_Builder.cs" />
+    <Compile Include="GifBuilder.cs" />
     <Compile Include="PCM\MFrame.cs" />
     <Compile Include="PCM\MFrameDeck.cs" />
     <Compile Include="OutlineHighlighter.cs" />
