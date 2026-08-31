@@ -33,7 +33,7 @@ The project is an application designed to output pictures in different variants 
 
 ### Usage
 
-1. Compile from source (*OR* download a [configured build](https://drive.google.com/file/d/1WQTh_wpeVlzAZ7tfNzkVKtC9KJ5UIjzq/view))
+1. Compile from source or download a binary
 2. Run `PictureConsoler.exe`
 3. Specify source file path
 4. Select options of image processing/displaying/replaying/writing
