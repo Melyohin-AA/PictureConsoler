@@ -38,9 +38,6 @@
     <ApplicationIcon>icon4.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ConsoleColorsLib">
-      <HintPath>..\_Libs\ConsoleColorsLib.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -80,6 +77,10 @@
     <Content Include="icon4.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ConsoleColorsLib\ConsoleColorsLib.csproj">
+      <Project>{7cd28e44-5426-4c70-89b3-675188c43d65}</Project>
+      <Name>ConsoleColorsLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PictureConsolerCommons\PictureConsolerCommons.csproj">
       <Project>{eadab1a2-18ac-476b-bc3c-c8d40d9ef590}</Project>
       <Name>PictureConsolerCommons</Name>

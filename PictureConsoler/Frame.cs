@@ -56,7 +56,7 @@ namespace PictureConsoler
 					stream.Write(colors[ix, iy]);
 		}
 
-		public virtual Bitmap ToBitmap()
+		public Bitmap ToBitmap()
 		{
 			Bitmap bitmap = new Bitmap(Deck.SymbolW * Deck.FrameW, Deck.SymbolH * Deck.FrameH);
 			var g = Graphics.FromImage(bitmap);
@@ -79,10 +79,12 @@ namespace PictureConsoler
 		}
 		private void GetBrushesOfSector(byte doubleColor, out Brush upperBrush, out Brush lowerBrush)
 		{
-			Color upperColor = ConsoleColorsLib.ConsoleColors.ConsoleColorValues[doubleColor >> 4];
-			Color lowerColor = ConsoleColorsLib.ConsoleColors.ConsoleColorValues[doubleColor & 0x0F];
+			Color upperColor = GetColor(doubleColor >> 4);
+			Color lowerColor = GetColor(doubleColor & 0x0F);
 			upperBrush = new SolidBrush(upperColor);
 			lowerBrush = new SolidBrush(lowerColor);
 		}
+
+		public abstract Color GetColor(int i);
 	}
 }

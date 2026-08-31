@@ -20,5 +20,10 @@ namespace PictureConsoler.Classic
 				}
 			}
 		}
+
+		public override Color GetColor(int i)
+		{
+			return ClassicFrameDeck.colorValues[i];
+		}
 	}
 }

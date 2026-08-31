@@ -32,8 +32,7 @@ namespace PictureConsoler.PCX
 
 		public void ApplyColorValues()
 		{
-			colorValues.CopyTo(ConsoleColorsLib.ConsoleColors.ConsoleColorValues, 0);
-			ConsoleColorsLib.ConsoleColors.ApplyColorValues();
+			ConsoleColorsLib.ConsoleColors.Recolor(colorValues);
 		}
 
 		public override void FillColors(Bitmap bitmap)
@@ -66,10 +65,9 @@ namespace PictureConsoler.PCX
 			}
 		}
 
-		public override Bitmap ToBitmap()
+		public override Color GetColor(int i)
 		{
-			colorValues.CopyTo(ConsoleColorsLib.ConsoleColors.ConsoleColorValues, 0);
-			return base.ToBitmap();
+			return colorValues[i];
 		}
 	}
 }

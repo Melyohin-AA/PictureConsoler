@@ -35,7 +35,7 @@ namespace PictureConsoler
 			//Console.InputEncoding = Console.OutputEncoding = System.Text.Encoding.UTF8;
 			Console.Clear();
 			Console.CursorSize = 50;
-			ConsoleColors.TryApplyColorValues();
+			ConsoleColors.Recolor(ConsoleColors.GetClassicColorValues());
 			for (ushort i = 0; i < 256; i++)
 			{
 				Console.ForegroundColor = (ConsoleColor)(i & 0x0F);

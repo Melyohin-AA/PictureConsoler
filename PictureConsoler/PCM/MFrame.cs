@@ -23,10 +23,9 @@ namespace PictureConsoler.PCM
 			}
 		}
 
-		public override Bitmap ToBitmap()
+		public override Color GetColor(int i)
 		{
-			MDeck.ColorValues.CopyTo(ConsoleColorsLib.ConsoleColors.ConsoleColorValues, 0);
-			return base.ToBitmap();
+			return MDeck.ColorValues[i];
 		}
 	}
 }

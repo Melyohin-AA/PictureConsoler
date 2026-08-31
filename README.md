@@ -1,5 +1,5 @@
 <div align="center">
-  <p align="right">v[1.104.1]</p>
+  <p align="right">v[1.104.2]</p>
   <h2 align="center">Picture Consoler</h2>
   <p align="center">Display pictures in the Windows console</p>
 </div>
@@ -33,7 +33,7 @@ The project is an application designed to output pictures in different variants 
 
 ### Usage
 
-1. Compile build of the `SensorMonitor` project via Visual Studio compiler (*OR* download [configured build](https://drive.google.com/file/d/1kOY1syEP82-f2W1pyNbwSb1MWq62hlPd/view?usp=sharing))
+1. Compile from source (*OR* download a [configured build](https://drive.google.com/file/d/1kOY1syEP82-f2W1pyNbwSb1MWq62hlPd/view?usp=sharing))
 2. Run `PictureConsoler.exe`
 3. Specify source file path
 4. Select options of image processing/displaying/replaying/writing

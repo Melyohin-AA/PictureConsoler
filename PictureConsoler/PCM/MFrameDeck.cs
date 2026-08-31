@@ -26,8 +26,7 @@ namespace PictureConsoler.PCM
 		public override void ApplyColorValues()
 		{
 			if (colorValuesApplied) return;
-			ColorValues.CopyTo(ConsoleColorsLib.ConsoleColors.ConsoleColorValues, 0);
-			ConsoleColorsLib.ConsoleColors.ApplyColorValues();
+			ConsoleColorsLib.ConsoleColors.Recolor(ColorValues);
 			colorValuesApplied = true;
 		}
 

@@ -18,8 +18,7 @@ namespace PictureConsoler.Classic
 		public override void ApplyColorValues()
 		{
 			if (colorValuesApplied) return;
-			colorValues.CopyTo(ConsoleColorsLib.ConsoleColors.ConsoleColorValues, 0);
-			ConsoleColorsLib.ConsoleColors.ApplyColorValues();
+			ConsoleColorsLib.ConsoleColors.Recolor(colorValues);
 			colorValuesApplied = true;
 		}
 
